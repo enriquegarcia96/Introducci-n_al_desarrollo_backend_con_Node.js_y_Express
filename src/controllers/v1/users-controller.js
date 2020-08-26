@@ -1,5 +1,22 @@
-const createUser = (req, res) =>{
+//* importo el paquere bcrypt
+const bcrypt = require('bcrypt')
+
+
+const createUser = async (req, res) =>{
+     try {
+     console.log('rep.body', req.body)
+
+     //para usar bcrypt
+     //await, que primero me haga la encriptacion y despues me mande la respuesta
+     const hash =  await bcrypt.hash(req.body.password, 15);
+     console.log('FIN',hash)
+
+     //accion pra guardar un usuario en una base de datos
      res.send({status:'OK', message:'user create'})
+     } catch (error) {
+          console.log(error)
+          res.status(500).send({status:'ERROR', message:error.message})
+     }
 }
 
 const deleteUsers = (req, res) =>{
