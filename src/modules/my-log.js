@@ -1,5 +1,5 @@
 //* importaciones locales  (module.exports.info =)
-function info( text ){
+const info = ( text ) => {
     console.log('INFO:', text)
     return text
 }

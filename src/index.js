@@ -1,84 +1,16 @@
-//importo un modulo NODEJS
-var http = require('http')//me permite  ejecutar JS al lado del servidor
+//* migro el codigo puro de NODEJS a un codigo compatible con express
+const express = require('express')//nombre del paquete de express (package.json)
 
-var url = require('url')
+//* importo las rutas de version 1
+const routesv1 = require('./routes/v1')
 
-var queryString = require('querystring') //modulo de cour de nodejs
+const app = express()//aqui ya creo una aplicacion de express
 
-//*modulos globales; importo mis funciones de la carpeta modules
-// var log = require('./modules/my-log')
-// var consts = require('./utils/consts')
-// var firebase = require('../libs/firebase')
-
-//* modulos locales; importacion parciales
-var {info,error} = require('./modules/my-log')
-var consts = require('./utils/consts')
-var firebase = require('../libs/firebase')
-
-//*importo el paquete countries-list manera parcial
-var {countries} = require('countries-list')
-const { join, parse } = require('path')
-
-//var require()//permite trabajar con archivos de NODEJS
-
-var  server = http.createServer((request, response) =>{
-
-    var parsed = url.parse(request.url)
-    console.log("parsed:", parsed)
-
-    var pathname =  parsed.pathname
+routesv1(app) // le paso la aplicacion de express
 
 
-    var query = queryString.parse(parsed.query)//le paso el parsed 
-    console.log("Query",query)
-
-    // response.writeHead(200,{'Content-Type': "application/json"})
-    // response.write(JSON.stringify(countries.HN))
-    // response.end()
-
-
-    if( pathname === '/' ){
-            response.writeHead(200,{"Content-Type":"text/html"})
-            response.write('<html><body><p>HOME PAGE</p></body></html>')
-            response.end()
-
-    }else if( pathname === '/exit' ){
-        response.writeHead(200,{"Content-Type":"text/html"})
-        response.write('<html><body><p>BYE</p></body></html>')
-        response.end()
-
-    }else if( pathname === '/info' ){
-
-        var result = info(request.url)//accedo alas funciones del archivo my-log
-        response.writeHead(200,{"Content-Type":"text/html"})
-        response.write(result)
-        response.end()
-
-    }else if( pathname === '/error' ){
-        var result = error(pathname)//accedo alas funciones del archivo my-log
-        response.writeHead(200,{"Content-Type":"text/html"})
-        response.write(result)
-        response.end()
-
-    }else if( pathname === '/country' ){
-        response.writeHead(200,{"Content-Type":"application/json"})
-        response.write(JSON.stringify(countries[query.code]))//paso el formato JSON a un String
-        response.end()
-
-    }else{
-        response.writeHead(404,{"Content-Type":"text/html"})
-        response.write('<html><body><p>NOT FOUND</p></body></html>')
-        response.end()
-
-    }
-
+//le difino la ruta por default con expressJS tipo get
+app.listen(4000, () => {
+     console.log('corriendo en 4000')
 })
-
-server.listen(4000)//se ejecute en el puerto 4000
-console.log('corriendo en 4000')
-
-
-
-
-
 
