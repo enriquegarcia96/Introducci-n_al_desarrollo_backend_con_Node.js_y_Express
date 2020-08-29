@@ -2,7 +2,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Users = require('../../mongo/models/users'); //para guardar los datos a mongo
-
+const Product = require('../../mongo/models/products');
 const expiresIn = 60 * 10;
 
 //metodo de seguridad a nuestra API
@@ -80,13 +80,36 @@ const createUser = async (req, res) => {
   }
 };
 
-const deleteUsers = (req, res) => {
-  res.send({ status: 'OK', message: 'user delete' });
+const deleteUsers = async (req, res) => {
+  try {
+    const { userId } = req.body; //obtengo el userID en el cuerpo de la peticion
+    //console.log('userID: ', userId);
+
+    if (!userId) {
+      //en caso que no se obtenga el UserID
+      throw new Error('missing param userID');
+    }
+
+    await Users.findByIdAndDelete(userId);
+
+    //cuando se elimine un usuario tambien se elimine los productos vinculados a ese usuario
+    await Product.deleteMany({ user: userId }); //si user == userID (es valida porque en mongo/models esta la propiedad que acepta un ObjectID )
+
+    res.send({ status: 'OK', message: 'user delete' });
+  } catch (error) {
+    res.status(500).send({ status: 'ERROR', message: error.message });
+  }
 };
 
 //retorna todos los usuarios registrados
-const getUsers = (req, res) => {
-  res.send({ status: 'OK', data: [] });
+const getUsers = async (req, res) => {
+  try {
+    //retonar todos los usuarios, solo con los campos que quiero que se muestre
+    const user = await Users.find().select({ password: 0, __v: 0, role: 0 });
+    res.send({ status: 'OK', data: user });
+  } catch (error) {
+    res.status(500).send({ status: 'ERROR', message: error.message });
+  }
 };
 
 //ruta para actualizar la informacion de un usuario
