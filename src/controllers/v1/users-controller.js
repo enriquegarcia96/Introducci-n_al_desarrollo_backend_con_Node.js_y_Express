@@ -1,6 +1,38 @@
 //* importo el paquere bcrypt
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const Users = require('../../mongo/models/users'); //para guardar los datos a mongo
+
+const expiresIn = 60 * 10;
+
+//metodo de seguridad a nuestra API
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    //findOne me retorna el primer usuario que coincida con mi busqueda
+    const user = await Users.findOne({ email });
+    if (user) {
+      //comprueba que la contraseña sea correcta
+      const isOK = await bcrypt.compare(password, user.password); //user.pass es el hass que esta almacenado en mi base
+      if (isOK) {
+        //* genero un token firmado con JWTSECRET
+        const token = jwt.sign(
+          { userId: user._id, role: user.role },
+          process.env.JWT_SECRET,
+          { expiresIn }
+        ); //con esto genero un  token el cual almacena el userID y el role del usuario
+
+        res.send({ status: 'OK', data: { token, expiresIn } });
+      } else {
+        res.status(403).send({ status: 'INVALID PASSWORD', message: '' });
+      }
+    } else {
+      res.status(401).send({ status: 'USER NOT FOUND', message: '' });
+    }
+  } catch (error) {
+    res.status(500).send({ status: 'ERROR', message: error.message });
+  }
+};
 
 const createUser = async (req, res) => {
   try {
@@ -60,8 +92,9 @@ const getUsers = (req, res) => {
 //ruta para actualizar la informacion de un usuario
 const updateUsers = async (req, res) => {
   try {
-    const { username, email, data, userId } = req.body;
-    await Users.findOneAndUpdate(userId, {
+    console.log('req.sessionData', req.sessionData.userId);
+    const { username, email, data } = req.body;
+    await Users.findByIdAndUpdate(req.sessionData.userId, {
       username,
       email,
       data,
@@ -84,4 +117,5 @@ module.exports = {
   deleteUsers,
   getUsers,
   updateUsers,
+  login,
 };
