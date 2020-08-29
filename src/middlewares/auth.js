@@ -31,7 +31,7 @@ const isAuth = (req, res, next) => {
       // }
 
       //le paso sessiondata(le puedo dar cualquier nombre) un object que  contiene el campo userID == data.userid
-      req.sessionData = { userId: data.userId }; //obtengo el userid gracias al jwt y lo guardo como un objet
+      req.sessionData = { userId: data.userId, role: data.role }; //obtengo el userid gracias al jwt y lo guardo como un objet
 
       next();
     } else {
@@ -56,7 +56,28 @@ const isAuth = (req, res, next) => {
   //   console.log('req.hostname', req.hostname);
 };
 
+const isAdmin = (req, res, next) => {
+  try {
+    const { role } = req.sessionData; //accedo al middlewares de isAuth con la variable sessionData
+    console.log('isAdmin: ', role);
+
+    if (role !== 'admin') {
+      throw {
+        code: 403,
+        status: 'ACCESS_DENIED',
+        message: 'invalid role',
+      };
+    }
+    next();
+  } catch (e) {
+    res
+      .status(e.code || 500)
+      .send({ status: e.status || 'ERROR', message: e.message });
+  }
+};
+
 module.exports = {
   isValidHostname,
   isAuth,
+  isAdmin,
 };
