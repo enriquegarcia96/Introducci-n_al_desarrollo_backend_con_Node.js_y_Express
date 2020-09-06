@@ -1,12 +1,14 @@
-//* importo el paquere bcrypt
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const Users = require('../../mongo/models/users'); //para guardar los datos a mongo
-const Product = require('../../mongo/models/products');
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { Request, Response } from 'express';
+
+import Users from '../../mongo/models/users';
+import Product from '../../mongo/models/products';
+
 const expiresIn = 60 * 10;
 
 //metodo de seguridad a nuestra API
-const login = async (req, res) => {
+const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
     //findOne me retorna el primer usuario que coincida con mi busqueda
@@ -18,7 +20,7 @@ const login = async (req, res) => {
         //* genero un token firmado con JWTSECRET
         const token = jwt.sign(
           { userId: user._id, role: user.role },
-          process.env.JWT_SECRET,
+          process.env.JWT_SECRET!,
           { expiresIn }
         ); //con esto genero un  token el cual almacena el userID y el role del usuario
 
@@ -34,7 +36,7 @@ const login = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
+const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
     console.log('rep.body', req.body);
 
@@ -80,7 +82,7 @@ const createUser = async (req, res) => {
   }
 };
 
-const deleteUsers = async (req, res) => {
+const deleteUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId } = req.body; //obtengo el userID en el cuerpo de la peticion
     //console.log('userID: ', userId);
@@ -102,7 +104,7 @@ const deleteUsers = async (req, res) => {
 };
 
 //retorna todos los usuarios registrados
-const getUsers = async (req, res) => {
+const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     //retonar todos los usuarios, solo con los campos que quiero que se muestre
     const user = await Users.find().select({ password: 0, __v: 0, role: 0 });
@@ -113,7 +115,7 @@ const getUsers = async (req, res) => {
 };
 
 //ruta para actualizar la informacion de un usuario
-const updateUsers = async (req, res) => {
+const updateUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     console.log('req.sessionData', req.sessionData.userId);
     const { username, email, data } = req.body;
@@ -135,10 +137,4 @@ const updateUsers = async (req, res) => {
 };
 
 //exporto la funcion dentro de un object
-module.exports = {
-  createUser,
-  deleteUsers,
-  getUsers,
-  updateUsers,
-  login,
-};
+export default { createUser, deleteUsers, getUsers, updateUsers, login };
