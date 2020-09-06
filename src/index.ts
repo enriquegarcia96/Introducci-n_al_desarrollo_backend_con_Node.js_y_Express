@@ -1,17 +1,29 @@
-//* migro el codigo puro de NODEJS a un codigo compatible con express
-const express = require('express'); //nombre del paquete de express (package.json)
+import express, { Application } from 'express';
+// const express = require('express'); // importo express con TS
+
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import bodyParser from 'body-parser';
+import routesv1 from './routes/v1';
+/*
 const bodyParser = require('body-parser'); //paquete de body-parser
 const dotenv = require('dotenv');
 const mongoose = require('mongoose'); //paquete de mongoose
+*/
 
-dotenv.config(); //para habilitar la lectura de variables de entorno
+//configuro las variables de entorno
+dotenv.config();
 
-//* importo las rutas de version 1
-const routesv1 = require('./routes/v1');
+declare global {
+  namespace Express {
+    export interface Request {
+      sessionData: any;
+    }
+  }
+}
 
-const app = express(); //aqui ya creo una aplicacion de express
-
-// console.log('MONGO', process.env.MONGO)//para poder acceder alas variables de entorno
+//aplicacion de express
+const app: Application = express();
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -24,11 +36,12 @@ routesv1(app); // le paso la aplicacion de express
 
 //hago que mi puerto de ejecucion de mi aplicacion salga de mis
 //variables de entorno
-const PORT = process.env.PORT || 4000; // o cuando no defina una variable de entorno
+const PORT: number | String = process.env.PORT || 4000; // o cuando no defina una variable de entorno
 
-//mi string de conexion (process.env.mongo)
+//mi string de conexion para conectarme con Mongosee(process.env.mongo)
 mongoose
-  .connect(process.env.MONGO, {
+  .connect(process.env.MONGO!, {
+    //con el signo de "!" le digo que esto siempre sera un String
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

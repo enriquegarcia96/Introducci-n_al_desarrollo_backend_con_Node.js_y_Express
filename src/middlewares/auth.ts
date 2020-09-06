@@ -1,6 +1,11 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 
-const isValidHostname = (req, res, next) => {
+const isValidHostname = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   const valiHosts = ['diana.ec', 'localhost'];
 
   if (valiHosts.includes(req.hostname)) {
@@ -12,7 +17,7 @@ const isValidHostname = (req, res, next) => {
   //   console.log('req.hostname', req.hostname);
 };
 
-const isAuth = (req, res, next) => {
+const isAuth = (req: Request, res: Response, next: NextFunction): void => {
   //   console.log('req.headers', req.headers);
 
   try {
@@ -20,7 +25,7 @@ const isAuth = (req, res, next) => {
 
     //si el token existe en la base
     if (token) {
-      const data = jwt.verify(token, process.env.JWT_SECRET);
+      const data: any = jwt.verify(token as string, process.env.JWT_SECRET!);
       console.log('jwt data: ', data);
       // if (data.userId !== req.body.userId && data.role !== 'admin') {
       //   throw {
@@ -56,7 +61,7 @@ const isAuth = (req, res, next) => {
   //   console.log('req.hostname', req.hostname);
 };
 
-const isAdmin = (req, res, next) => {
+const isAdmin = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const { role } = req.sessionData; //accedo al middlewares de isAuth con la variable sessionData
     console.log('isAdmin: ', role);
@@ -76,8 +81,4 @@ const isAdmin = (req, res, next) => {
   }
 };
 
-module.exports = {
-  isValidHostname,
-  isAuth,
-  isAdmin,
-};
+export { isValidHostname, isAuth, isAdmin };

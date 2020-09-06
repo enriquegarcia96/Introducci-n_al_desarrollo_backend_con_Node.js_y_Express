@@ -1,11 +1,13 @@
-const Products = require('../../mongo/models/products');
+import { Request, Response } from 'express';
 
-const createProduct = async (req, res) => {
+import Products from '../../mongo/models/products';
+
+const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     //le paso las propiedades
     const { title, desc, price, images, userId } = req.body;
 
-    //creo el producto
+    //creo el producto de mongoDB
     const product = await Products.create({
       title,
       desc,
@@ -21,9 +23,7 @@ const createProduct = async (req, res) => {
   }
 };
 
-const deleteProduct = (req, res) => {};
-
-const getProduct = async (req, res) => {
+const getProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     //recupero todos los productos de la base
     //retorna todos los productod de MONGO y populate retorna  los datos que necesito del USER
@@ -42,7 +42,7 @@ const getProduct = async (req, res) => {
 };
 
 //obtener producto de un usario en especifico
-const getProductByUser = async (req, res) => {
+const getProductByUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await Products.find({
       user: req.params.userId, //le filtro el usuario como un objeto(object)
@@ -56,9 +56,8 @@ const getProductByUser = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   createProduct,
-  deleteProduct,
   getProduct,
   getProductByUser,
 };
