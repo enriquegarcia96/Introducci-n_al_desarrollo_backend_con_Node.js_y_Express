@@ -4,7 +4,7 @@ import express, { Application } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import routesv1 from './routes/v1';
+import routesv1     from './routes/v1';
 /*
 const bodyParser = require('body-parser'); //paquete de body-parser
 const dotenv = require('dotenv');
